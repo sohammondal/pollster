@@ -4,10 +4,12 @@
     <div class="card text-center">
         <div class="card-body">
             <h1>Welcome to Pollster</h1>
-            <p>This is my Django app</p>
+            <p>This is my first Django app</p>
             <a class="btn btn-dark" href="{% url 'polls:index' %}">View polls here</a>
         </div>
+        {% include 'partials/_developed-by.html' %}
     </div>
+
 
 
 {% endblock %}
