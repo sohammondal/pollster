@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 from django.core.exceptions import ImproperlyConfigured
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def get_env_value(env_variable):
     try:
@@ -28,10 +31,18 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = get_env_value('SECRET_KEY')
+
+SECRET_KEY = ""
+ENVIRONMENT = ""
+
+try:
+    SECRET_KEY = get_env_value('SECRET_KEY')
+    ENVIRONMENT = get_env_value('ENVIRONMENT')
+except Exception as ex:
+    print(ex)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True if ENVIRONMENT == "DEV" else False
 
 ALLOWED_HOSTS = ['pollster-django-app.herokuapp.com','localhost']
 
@@ -83,11 +94,14 @@ WSGI_APPLICATION = 'pollster.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+    } if ENVIRONMENT == 'DEV' else dj_database_url.config(
+        default= get_env_value('DATABASE_URL')
+    )
 }
 
 
@@ -128,3 +142,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATIC_URL = '/static/'
+# Extra places for collectstatic to find static files.
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'static'),
+)
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
